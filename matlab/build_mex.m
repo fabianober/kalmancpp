@@ -8,26 +8,43 @@ function build_mex()
     fprintf('Building Kalman Filter MEX file...\n');
     fprintf('==================================\n');
     
-    % Check if we're in the right directory
-    if ~exist('kalman.cpp', 'file') || ~exist('kalman.h', 'file')
-        error('kalman.cpp and kalman.h must be in the current directory');
+    % Get the current directory and set up paths
+    current_dir = pwd;
+    [matlab_dir, ~, ~] = fileparts(mfilename('fullpath'));
+    project_root = fileparts(matlab_dir);
+    src_dir = fullfile(project_root, 'src');
+    
+    % Check if source files exist
+    kalman_cpp_path = fullfile(src_dir, 'kalman.cpp');
+    kalman_h_path = fullfile(src_dir, 'kalman.h');
+    kalman_mex_path = fullfile(matlab_dir, 'kalman_mex.cpp');
+    
+    if ~exist(kalman_cpp_path, 'file') || ~exist(kalman_h_path, 'file')
+        error('kalman.cpp and kalman.h must be in the src directory');
     end
     
-    if ~exist('kalman_mex.cpp', 'file')
-        error('kalman_mex.cpp must be in the current directory');
+    if ~exist(kalman_mex_path, 'file')
+        error('kalman_mex.cpp must be in the matlab directory');
     end
     
     try
         % Compile the MEX file
         % Include both the MEX interface and the Kalman filter implementation
         fprintf('Compiling MEX file...\n');
+        fprintf('Source files:\n');
+        fprintf('  MEX interface: %s\n', kalman_mex_path);
+        fprintf('  Implementation: %s\n', kalman_cpp_path);
+        fprintf('  Header: %s\n', kalman_h_path);
+        
+        % Add include path for headers
+        include_flag = ['-I' src_dir];
         
         % For Windows
         if ispc
-            mex('-v', 'kalman_mex.cpp', 'kalman.cpp', '-std=c++17');
+            mex('-v', kalman_mex_path, kalman_cpp_path, include_flag, '-std=c++17');
         % For macOS and Linux
         else
-            mex('-v', 'kalman_mex.cpp', 'kalman.cpp', 'CXXFLAGS="$CXXFLAGS -std=c++17"');
+            mex('-v', kalman_mex_path, kalman_cpp_path, include_flag, 'CXXFLAGS="$CXXFLAGS -std=c++17"');
         end
         
         fprintf('\n✓ MEX file compiled successfully!\n');
@@ -52,7 +69,7 @@ function build_mex()
         kalman_mex('delete', filter_id);
         
         fprintf('\n✓ MEX file is ready to use!\n');
-        fprintf('Run kalman_demo() to see a complete demonstration.\n');
+        fprintf('Run examples/kalman_demo() to see a complete demonstration.\n');
         
     catch ME
         fprintf('\n✗ Compilation failed!\n');

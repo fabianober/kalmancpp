@@ -1,178 +1,180 @@
-# Simple Kalman Filter in C++
+# Kalman Filter C++ Implementation with MATLAB Interface
 
-A basic implementation of a 1D Kalman filter for educational purposes, demonstrating the core concepts of optimal estimation under uncertainty.
+A high-performance C++ implementation of a Simple Kalman Filter with a complete MATLAB interface using MEX files.
 
-## 📋 Overview
-
-This project implements a simple scalar Kalman filter that can track a single value over time by optimally combining noisy measurements with predictions. It's designed to be as simple as possible while still demonstrating the fundamental principles of Kalman filtering.
-
-## 🎯 What is a Kalman Filter?
-
-A Kalman filter is an optimal estimator that:
-
-- **Predicts** where a system will be next based on a model
-- **Updates** that prediction using noisy measurements
-- **Balances trust** between predictions and measurements based on their uncertainties
-- **Minimizes estimation error** over time
-
-Think of it as a smart way to filter noise from sensor data while accounting for how confident you are in your predictions vs measurements.
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 kalmancpp/
-├── main.cpp           # Demo program showing filter in action
-├── kalman.h           # Kalman filter class declaration
-├── kalman.cpp         # Kalman filter implementation
-├── utils.h            # Utility functions header
-├── utils.cpp          # Utility functions implementation
-├── .vscode/
-│   └── tasks.json     # VS Code build/run tasks
-└── README.md          # This file
+├── src/                    # C++ source code
+│   ├── kalman.h           # Kalman filter header
+│   ├── kalman.cpp         # Kalman filter implementation
+│   ├── utils.h            # Utility functions header
+│   └── utils.cpp          # Utility functions implementation
+├── matlab/                 # MATLAB interface
+│   ├── kalman_mex.cpp     # MEX interface code
+│   ├── KalmanFilter.m     # MATLAB wrapper class
+│   ├── build_mex.m        # MEX compilation script
+│   └── test_kalman_interface.m  # Test script
+├── examples/               # Example code and demos
+│   ├── main.cpp           # C++ standalone example
+│   └── kalman_demo.m      # MATLAB demo script
+├── docs/                   # Documentation
+│   └── MATLAB_README.md   # Detailed MATLAB usage guide
+└── README.md              # This file
 ```
 
-## 🛠️ Building and Running
+## Quick Start
 
-### Prerequisites
+### C++ Standalone Version
 
-- C++ compiler with C++17 support (g++, clang++)
-- VS Code (optional, but configured)
+1. **Build the C++ project:**
 
-### Command Line Build
+   ```bash
+   g++ -std=c++17 -Wall -Wextra -g -o program src/kalman.cpp src/utils.cpp examples/main.cpp
+   ```
+
+2. **Run the example:**
+   ```bash
+   ./program
+   ```
+
+### MATLAB Interface
+
+1. **Open MATLAB and navigate to the project root directory**
+
+2. **Build the MEX interface:**
+
+   ```matlab
+   cd matlab
+   build_mex()
+   ```
+
+3. **Run the demo:**
+
+   ```matlab
+   cd ../examples
+   kalman_demo()
+   ```
+
+4. **Or use the object-oriented interface:**
+   ```matlab
+   addpath('matlab')
+   filter = KalmanFilter(0.0, 1.0, 0.01, 0.1);
+   filter.step(5.0);  % Process a measurement
+   estimate = filter.getState();
+   ```
+
+## Features
+
+### C++ Implementation
+
+- **High Performance**: Optimized C++ implementation
+- **Simple Interface**: Easy-to-use class-based API
+- **Well Documented**: Extensive comments explaining the theory
+- **Memory Safe**: Proper resource management
+
+### MATLAB Interface
+
+- **MEX Integration**: High-performance C++ backend with MATLAB frontend
+- **Object-Oriented**: Clean MATLAB class wrapper
+- **Batch Processing**: Efficient processing of multiple measurements
+- **Visualization**: Built-in plotting capabilities
+- **Error Handling**: Comprehensive error checking and reporting
+
+## Usage Examples
+
+### Basic C++ Usage
+
+```cpp
+#include "src/kalman.h"
+
+// Create filter: initial_estimate, initial_error, process_noise, measurement_noise
+SimpleKalmanFilter filter(0.0, 1.0, 0.01, 0.1);
+
+// Process measurements
+std::vector<double> measurements = {4.9, 5.1, 4.8, 5.2};
+for (double measurement : measurements) {
+    filter.predict();
+    filter.update(measurement);
+    std::cout << "Estimate: " << filter.getState() << std::endl;
+}
+```
+
+### Basic MATLAB Usage
+
+```matlab
+% Add MATLAB directory to path
+addpath('matlab')
+
+% Create filter
+filter = KalmanFilter(0.0, 1.0, 0.01, 0.1);
+
+% Process measurements
+measurements = [4.9, 5.1, 4.8, 5.2];
+[estimates, uncertainties] = filter.process(measurements);
+
+% Visualize results
+filter.plotResults(measurements, 'TrueValue', 5.0);
+```
+
+## Dependencies
+
+### C++ Requirements
+
+- C++17 compatible compiler (GCC 7+, Clang 5+, MSVC 2017+)
+- Standard library only (no external dependencies)
+
+### MATLAB Requirements
+
+- MATLAB R2017b or later
+- MEX compiler configured (`mex -setup cpp`)
+- For macOS: Xcode Command Line Tools
+- For Windows: Visual Studio or MinGW
+- For Linux: GCC with C++17 support
+
+## Documentation
+
+- **[MATLAB Interface Guide](docs/MATLAB_README.md)** - Comprehensive MATLAB usage documentation
+- **[C++ API Documentation](src/kalman.h)** - Detailed C++ interface documentation
+- **[Examples](examples/)** - Working examples in both C++ and MATLAB
+
+## Testing
+
+### Test C++ Implementation
 
 ```bash
-g++ -std=c++17 -Wall -Wextra -g -o program main.cpp utils.cpp kalman.cpp
+# Build and run C++ tests
+g++ -std=c++17 -Wall -Wextra -g -o program src/kalman.cpp src/utils.cpp examples/main.cpp
 ./program
 ```
 
-### VS Code Build
+### Test MATLAB Interface
 
-- Press `Cmd+Shift+B` (macOS) or `Ctrl+Shift+B` (Windows/Linux) to build
-- Use `Cmd+Shift+P` → "Tasks: Run Task" → "Run C++ Program" to run
-
-## 🚀 Demo Scenario
-
-The program demonstrates a Kalman filter tracking a constant value (5.0) using noisy sensor measurements:
-
-- **True Value**: 5.0 (what we're trying to estimate)
-- **Initial Guess**: 0.0 (deliberately wrong to show convergence)
-- **Noisy Measurements**: Values around 5.0 with random noise
-- **Goal**: Filter the noise to get a better estimate
-
-### Expected Output
-
-```
-Kalman Filter Demo
-==================
-True value: 5.0
-Measurement -> Filtered Estimate
-4.9 -> 4.45856
-5.1 -> 4.78086
-4.8 -> 4.78806
-5.2 -> 4.9209
-4.95 -> 4.92954
-5.05 -> 4.96377
-4.85 -> 4.9322
-5.15 -> 4.99189
-Final estimate: 4.99189
-Final uncertainty: 0.0274074
+```matlab
+cd matlab
+test_kalman_interface()
 ```
 
-## 🧮 How It Works
+## Theory
 
-### The Filter Parameters
+This implements a simple 1D Kalman filter for tracking a scalar value. The filter operates in two steps:
 
-| Parameter                 | Value | Meaning                              |
-| ------------------------- | ----- | ------------------------------------ |
-| **Initial Estimate**      | 0.0   | Our first guess (deliberately wrong) |
-| **Initial Error**         | 1.0   | How uncertain we are about our guess |
-| **Process Noise (Q)**     | 0.01  | How much the true value might change |
-| **Measurement Noise (R)** | 0.1   | How noisy our sensor readings are    |
+1. **Predict**: Project current state estimate forward in time
+2. **Update**: Correct prediction using new measurement
 
-### The Two-Step Cycle
+Key parameters:
 
-1. **PREDICT**: Project current estimate forward
+- **Process Noise (Q)**: How much the true value changes over time
+- **Measurement Noise (R)**: How noisy the sensor measurements are
+- **Initial Error (P)**: Initial uncertainty in the estimate
 
-   - Estimate stays the same (constant model)
-   - Uncertainty increases by process noise
+The filter automatically balances trust between predictions and measurements based on their relative uncertainties.
 
-2. **UPDATE**: Correct prediction with measurement
-   - Calculate Kalman gain (trust ratio)
-   - Blend prediction with measurement
-   - Reduce uncertainty (gain confidence)
+## License
 
-### Key Equations
+This project is provided for educational and research purposes.
 
-```cpp
-// Kalman Gain (trust ratio)
-K = P / (P + R)
+## Contributing
 
-// State Update (blend prediction and measurement)
-x = x + K * (measurement - x)
-
-// Uncertainty Update (gain confidence)
-P = (1 - K) * P
-```
-
-## 📊 What to Observe
-
-1. **Convergence**: The estimate moves from 0.0 toward 5.0
-2. **Noise Filtering**: Filtered values are closer to truth than raw measurements
-3. **Uncertainty Reduction**: Final uncertainty (0.027) << initial uncertainty (1.0)
-4. **Optimal Blending**: Early measurements have more influence than later ones
-
-## 🎛️ Tuning Parameters
-
-### Process Noise (Q)
-
-- **Higher Q**: More responsive to changes, less smooth
-- **Lower Q**: More stable, slower to adapt
-- **Use when**: The true value might change over time
-
-### Measurement Noise (R)
-
-- **Higher R**: Trust measurements less, smoother output
-- **Lower R**: Trust measurements more, more responsive
-- **Use when**: You know how noisy your sensor is
-
-## 🔬 Educational Value
-
-This implementation is designed for learning:
-
-- **Extensively commented** code explaining every step
-- **Simple scalar math** (no matrices needed)
-- **Clear variable names** matching textbook notation
-- **Real-world scenario** that's easy to understand
-- **Observable results** showing filter performance
-
-## 🚀 Extensions
-
-This basic filter could be extended to:
-
-- **Multi-dimensional states** (position + velocity)
-- **Different motion models** (constant velocity, acceleration)
-- **Control inputs** (known forces/commands)
-- **Non-linear systems** (Extended/Unscented Kalman Filters)
-
-## 📚 Further Reading
-
-- [Kalman Filter Wikipedia](https://en.wikipedia.org/wiki/Kalman_filter)
-- "Kalman and Bayesian Filters in Python" by Roger Labbe
-- "Optimal State Estimation" by Dan Simon
-
-## 🤝 Contributing
-
-This is an educational project. Feel free to:
-
-- Add more examples
-- Improve documentation
-- Create additional demos
-- Suggest parameter tuning exercises
-
-## 📄 License
-
-This project is for educational use. Feel free to use and modify as needed.
-
----
-
-_Built with ❤️ for learning Kalman filtering fundamentals_
+Contributions are welcome! Please feel free to submit issues, suggestions, or pull requests.

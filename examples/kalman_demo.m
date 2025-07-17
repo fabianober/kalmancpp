@@ -12,9 +12,20 @@ function kalman_demo()
     fprintf('C++ Kalman Filter MATLAB Interface Demo\n');
     fprintf('===========================================\n\n');
     
+    % Add matlab directory to path
+    [examples_dir, ~, ~] = fileparts(mfilename('fullpath'));
+    project_root = fileparts(examples_dir);
+    matlab_dir = fullfile(project_root, 'matlab');
+    addpath(matlab_dir);
+    
     % Check if MEX file exists
     if ~exist('kalman_mex', 'file')
-        error('kalman_mex MEX file not found. Please compile it first using build_mex.m');
+        fprintf('MEX file not found. Attempting to build...\n');
+        try
+            run(fullfile(matlab_dir, 'build_mex.m'));
+        catch
+            error('kalman_mex MEX file not found. Please run matlab/build_mex.m first.');
+        end
     end
     
     %% DEMO 1: Basic Filter Usage

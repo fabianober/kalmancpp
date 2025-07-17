@@ -12,9 +12,10 @@
         "-g",
         "-o",
         "program",
-        "main.cpp",
-        "utils.cpp",
-        "kalman.cpp"
+        "examples/main.cpp",
+        "src/utils.cpp",
+        "src/kalman.cpp",
+        "-Isrc"
       ],
       "group": {
         "kind": "build",
@@ -44,6 +45,37 @@
       "problemMatcher": [],
       "isBackground": false,
       "detail": "Remove compiled executable"
+    },
+    {
+      "label": "Build MATLAB MEX",
+      "type": "shell",
+      "command": "matlab",
+      "args": ["-batch", "cd('matlab'); build_mex(); exit;"],
+      "group": "build",
+      "problemMatcher": [],
+      "isBackground": false,
+      "detail": "Build the MATLAB MEX interface"
+    },
+    {
+      "label": "Run MATLAB Demo",
+      "type": "shell",
+      "command": "matlab",
+      "args": ["-batch", "cd('examples'); kalman_demo(); exit;"],
+      "group": "test",
+      "dependsOn": "Build MATLAB MEX",
+      "problemMatcher": [],
+      "isBackground": false,
+      "detail": "Run the MATLAB demonstration"
+    },
+    {
+      "label": "Setup MATLAB Environment",
+      "type": "shell",
+      "command": "matlab",
+      "args": ["-batch", "setup_kalman(); exit;"],
+      "group": "build",
+      "problemMatcher": [],
+      "isBackground": false,
+      "detail": "Complete MATLAB environment setup"
     }
   ]
 }
