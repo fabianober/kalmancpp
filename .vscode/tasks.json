@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build C++ Project",
+      "type": "shell",
+      "command": "/usr/bin/g++",
+      "args": [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-g",
+        "-o",
+        "program",
+        "main.cpp",
+        "utils.cpp",
+        "kalman.cpp"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"],
+      "isBackground": false,
+      "detail": "Compile the C++ project with debug symbols"
+    },
+    {
+      "label": "Run C++ Program",
+      "type": "shell",
+      "command": "./program",
+      "args": [],
+      "group": "test",
+      "dependsOn": "Build C++ Project",
+      "problemMatcher": [],
+      "isBackground": false,
+      "detail": "Run the compiled C++ program"
+    },
+    {
+      "label": "Clean Build",
+      "type": "shell",
+      "command": "rm",
+      "args": ["-f", "program"],
+      "group": "build",
+      "problemMatcher": [],
+      "isBackground": false,
+      "detail": "Remove compiled executable"
+    }
+  ]
+}
